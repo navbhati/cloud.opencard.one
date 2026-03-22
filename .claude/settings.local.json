@@ -6,7 +6,8 @@
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(npx next build:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

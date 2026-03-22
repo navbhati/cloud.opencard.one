@@ -15,6 +15,7 @@ import { Suspense } from "react";
 import { CreditInfo } from "@/components/credit-info";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useEdgeConfig } from "@/providers/EdgeConfigProvider";
+import { Info } from "lucide-react";
 
 /* //
  * This is the sidebar auto collapse function.
@@ -23,11 +24,8 @@ import { useEdgeConfig } from "@/providers/EdgeConfigProvider";
  * It is used to prevent the sidebar from being too wide. */
 const COLLAPSE_ON_ROUTES = [
   "/agents",
-  "/chat",
-  "/distribution",
-  "/creatives",
-  "/content/source",
-  "/content/library",
+  "/mandates",
+  "/governance/audit",
 ];
 function SidebarAutoCollapse() {
   const pathname = usePathname();
@@ -73,6 +71,10 @@ export default function DashboardLayout({
       <SidebarAutoCollapse />
       <AppSidebar />
       <SidebarInset className="min-w-0 overflow-x-hidden max-w-full flex flex-col h-screen">
+        <div className="bg-amber-50 dark:bg-amber-950 border-b border-amber-200 dark:border-amber-800 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-800 dark:text-amber-300 text-xs font-medium shrink-0">
+          <Info className="h-3.5 w-3.5 shrink-0" />
+          <span>Demo environment — all data is simulated. No real transactions or agents.</span>
+        </div>
         <header className="bg-background sticky top-0 z-50 flex shrink-0 items-center gap-2 border-b p-2 overflow-x-hidden">
           <div className="flex items-center gap-2 px-2">
             <SidebarTrigger className="-ml-1" />

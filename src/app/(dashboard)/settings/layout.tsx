@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ChartLine, CreditCard, UserStar, Globe } from "lucide-react";
+import { ChartLine, CreditCard, UserStar, Globe, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "@/lib/toast";
@@ -10,7 +10,7 @@ import {
   type SidebarNavItem,
 } from "@/components/layouts/page-with-sidebar";
 
-type SettingsSection = "profile" | "general" | "billing" | "insights";
+type SettingsSection = "profile" | "general" | "billing" | "team" | "insights";
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
     if (pathname.includes("/settings/general")) return "general";
     if (pathname.includes("/settings/billing")) return "billing";
     if (pathname.includes("/settings/profile")) return "profile";
+    if (pathname.includes("/settings/team")) return "team";
     if (pathname.includes("/settings/insights")) return "insights";
     return "profile";
   };
@@ -45,6 +46,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       case "billing":
         router.push("/settings/billing");
         break;
+      case "team":
+        router.push("/settings/team");
+        break;
     }
   };
 
@@ -66,6 +70,12 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       label: "Plan & Billing",
       icon: CreditCard,
       onClick: () => handleSectionClick("billing"),
+    },
+    {
+      id: "team",
+      label: "Team & Permissions",
+      icon: Users,
+      onClick: () => handleSectionClick("team"),
     },
     {
       id: "insights",

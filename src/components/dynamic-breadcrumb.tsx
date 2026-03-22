@@ -17,8 +17,19 @@ import { SITE_CONFIG } from "@/config/platform/site_config";
 // Map path segments to readable labels
 const pathLabelMap: Record<string, string> = {
   "": "Home",
+  agents: "Agent Registry",
+  mandates: "Mandate Manager",
+  identity: "Identity & KYA",
+  governance: "Governance",
+  policies: "Policy Engine",
+  audit: "Audit Trail",
+  anomalies: "Anomaly Detection",
+  protocols: "Protocol Bridge",
+  developers: "SDK & Docs",
   settings: "Settings",
   profile: "Profile",
+  general: "Organisation",
+  team: "Team & Permissions",
   billing: "Plan & Billing",
   plans: "Plans",
 };

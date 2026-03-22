@@ -1,7 +1,21 @@
 "use client";
 
 import * as React from "react";
-import { Home, Settings, CreditCard, HandHeart } from "lucide-react";
+import {
+  Home,
+  Settings,
+  Bot,
+  FileCheck,
+  Fingerprint,
+  ShieldCheck,
+  ScrollText,
+  AlertTriangle,
+  Network,
+  Code2,
+  Building2,
+  Users,
+  CreditCard,
+} from "lucide-react";
 
 import { NavMain, type NavGroup } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -15,26 +29,72 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
-import { CreditInfo } from "./credit-info";
 import { SITE_CONFIG } from "@/config/platform/site_config";
-import { ReferralButton } from "./referral/referral-button";
-import { ReferralDialog } from "./referral/referral-dialog";
 
 const navGroups: NavGroup[] = [
   {
     items: [
       {
-        title: "Home",
+        title: "Dashboard",
         url: "/",
         icon: Home,
+      },
+    ],
+  },
+  {
+    label: "Core",
+    items: [
+      {
+        title: "Agent Registry",
+        url: "/agents",
+        icon: Bot,
+      },
+      {
+        title: "Mandate Manager",
+        url: "/mandates",
+        icon: FileCheck,
+      },
+      {
+        title: "Identity & KYA",
+        url: "/identity",
+        icon: Fingerprint,
+      },
+    ],
+  },
+  {
+    label: "Governance",
+    items: [
+      {
+        title: "Policy Engine",
+        url: "/governance/policies",
+        icon: ShieldCheck,
+      },
+      {
+        title: "Audit Trail",
+        url: "/governance/audit",
+        icon: ScrollText,
+      },
+      {
+        title: "Anomaly Detection",
+        url: "/governance/anomalies",
+        icon: AlertTriangle,
+      },
+    ],
+  },
+  {
+    label: "Infrastructure",
+    items: [
+      {
+        title: "Protocol Bridge",
+        url: "/protocols",
+        icon: Network,
+      },
+      {
+        title: "SDK & Docs",
+        url: "/developers",
+        icon: Code2,
       },
     ],
   },
@@ -42,8 +102,18 @@ const navGroups: NavGroup[] = [
     label: "Account",
     items: [
       {
-        title: "Plans",
-        url: "/plans",
+        title: "Organisation",
+        url: "/settings/general",
+        icon: Building2,
+      },
+      {
+        title: "Team",
+        url: "/settings/team",
+        icon: Users,
+      },
+      {
+        title: "Billing",
+        url: "/settings/billing",
         icon: CreditCard,
       },
       {
@@ -59,7 +129,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const [isReferralDialogOpen, setIsReferralDialogOpen] = React.useState(false);
 
   const userData = {
     name:
@@ -132,32 +201,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain groups={navGroups} />
       </SidebarContent>
       <SidebarFooter>
-        {isCollapsed ? (
-          <div className="px-2 py-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-full"
-                  onClick={() => setIsReferralDialogOpen(true)}
-                >
-                  <HandHeart className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Share with friends</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        ) : (
-          <ReferralButton variant="banner-dismissible" className="mb-2" />
-        )}
-        <ReferralDialog
-          open={isReferralDialogOpen}
-          onOpenChange={setIsReferralDialogOpen}
-        />
-        {!isCollapsed && <CreditInfo variant="compact" showAction={false} />}
         <NavUser
           user={{
             name: userData.name,
