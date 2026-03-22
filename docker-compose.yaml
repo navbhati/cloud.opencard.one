@@ -1,0 +1,16 @@
+services:
+  # SQL Database
+  sql_db:
+    image: postgres:15
+    container_name: sql_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: localadmin
+      POSTGRES_PASSWORD: securelocalpassword
+      POSTGRES_DB: infographix_appdb_local
+    volumes:
+      - sql-db-data:/var/lib/postgresql/data
+
+volumes:
+  sql-db-data:

@@ -1,0 +1,192 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  TRIAL
+  CANCELED
+  PAST_DUE
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  NONE
+}
+
+enum CreditTransactionType {
+  ALLOCATED
+  DEDUCTED
+  RESET
+  REFUNDED
+  REFERRAL_REWARD
+}
+
+enum BlobCategory {
+  UPLOAD
+  EXPORT
+  ASSET
+  TEMP
+}
+
+enum BlobVisibility {
+  PRIVATE
+  PUBLIC
+  SHARED
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  name               String?
+  email              String              @unique
+  clerkId            String              @unique
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  subscription       Subscription?
+  creditBalance      CreditBalance?
+  creditTransactions CreditTransaction[]
+  referralsGiven     Referral[]          @relation("ReferrerReferrals")
+  referralsReceived  Referral[]          @relation("RefereeReferrals")
+  referredByCode     String?
+  blobs              Blob[]
+  preferences        Preferences?
+}
+
+model Plan {
+  id                   String         @id
+  name                 String
+  description          String
+  monthlyPrice         Float
+  yearlyPrice          Float
+  creditsPerMonth      Int
+  features             String[]
+  cta                  String         @default("Get started")
+  popular              Boolean        @default(false)
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+  trialDays            Int            @default(0)
+  isActive             Boolean        @default(true)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  subscriptions        Subscription[]
+}
+
+model Subscription {
+  id                   Int                @id @default(autoincrement())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId               String
+  plan                 Plan               @relation(fields: [planId], references: [id])
+  status               SubscriptionStatus @default(TRIAL)
+  billingCycle         BillingCycle       @default(NONE)
+  trialStartDate       DateTime?
+  trialEndDate         DateTime?
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([planId])
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+}
+
+model CreditBalance {
+  id               Int       @id @default(autoincrement())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditsRemaining Int       @default(0)
+  creditsAllocated Int       @default(0)
+  lastResetAt      DateTime  @default(now())
+  nextResetAt      DateTime?
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model CreditTransaction {
+  id           Int                   @id @default(autoincrement())
+  userId       String
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         CreditTransactionType
+  amount       Int
+  balanceAfter Int
+  reason       String
+  metadata     Json?
+  createdAt    DateTime              @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type])
+}
+
+model Referral {
+  id             String    @id @default(uuid())
+  referrerId     String
+  referrerUser   User      @relation("ReferrerReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeId      String?
+  refereeUser    User?     @relation("RefereeReferrals", fields: [refereeId], references: [id], onDelete: Cascade)
+  referralCode   String    @unique
+  creditsAwarded Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  usedAt         DateTime?
+
+  @@index([referrerId])
+  @@index([referralCode])
+}
+
+model Blob {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  url         String
+  downloadUrl String
+  pathname    String @unique
+  filename    String
+  contentType String
+  size        Int
+
+  category   BlobCategory   @default(UPLOAD)
+  visibility BlobVisibility @default(PRIVATE)
+  folder     String?
+
+  metadata Json?
+  tags     String[] @default([])
+
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId, category])
+  @@index([pathname])
+  @@index([userId, createdAt])
+  @@index([expiresAt])
+}
+
+model Preferences {
+  id     String  @id @default("global")
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  timezone String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
